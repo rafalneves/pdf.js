@@ -112,6 +112,9 @@ class AnnotationFactory {
       case 'FileAttachment':
         return new FileAttachmentAnnotation(parameters);
 
+      case 'Movie':
+        return new MovieAnnotation(parameters);
+
       default:
         if (!subtype) {
           warn('Annotation is missing the required /Subtype.');
@@ -1035,6 +1038,15 @@ class FileAttachmentAnnotation extends Annotation {
 
     this.data.annotationType = AnnotationType.FILEATTACHMENT;
     this.data.file = file.serializable;
+    this._preparePopup(parameters.dict);
+  }
+}
+
+class MovieAnnotation extends Annotation {
+  constructor(parameters) {
+    super(parameters);
+
+    this.data.annotationType = AnnotationType.MOVIE;
     this._preparePopup(parameters.dict);
   }
 }

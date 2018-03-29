@@ -104,6 +104,9 @@ class AnnotationElementFactory {
       case AnnotationType.FILEATTACHMENT:
         return new FileAttachmentAnnotationElement(parameters);
 
+      case AnnotationType.Movie:
+        return new MovieAnnotationElement(parameters);
+
       default:
         return new AnnotationElement(parameters);
     }
@@ -1177,6 +1180,30 @@ class FileAttachmentAnnotationElement extends AnnotationElement {
       return;
     }
     this.downloadManager.downloadData(this.content, this.filename, '');
+  }
+}
+
+class MovieAnnotationElement extends AnnotationElement {
+  constructor(parameters) {
+    super(parameters, /* isRenderable = */ true);
+  }
+
+  /**
+   * Render the movie annotation's HTML element in the empty
+   * container.
+   *
+   * @public
+   * @memberof MovieAnnotationElement
+   * @returns {HTMLSectionElement}
+   */
+  render() {
+    this.container.className = 'movieAnnotation';
+
+    let movie = document.createElement('video');
+    movie.setAttribute('src', 'none');
+    this.container.append(movie);
+//console.log(this.data)
+    return this.container;
   }
 }
 
