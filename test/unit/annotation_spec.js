@@ -1388,4 +1388,45 @@ describe('annotation', function() {
       expect(annotation.viewable).toEqual(true);
     });
   });
+
+  describe('MovieAnnotation', function() {
+    it('should set the movie data', function() {
+      var movieDict = new Dict();
+      movieDict.set('Type', Name.get('Annot'));
+      movieDict.set('Subtype', Name.get('Movie'));
+      movieDict.set('F', '123');
+
+      var lineRef = new Ref(122, 0);
+      var xref = new XRefMock([
+        { ref: lineRef, data: movieDict, }
+      ]);
+
+      var annotation = AnnotationFactory.create(xref, lineRef, pdfManagerMock,
+                                                idFactoryMock);
+      var data = annotation.data;
+      expect(data.annotationType).toEqual(AnnotationType.MOVIE);
+
+      expect(data.src).toEqual('123');
+    });
+  });
+  describe('ScreenAnnotation', function() {
+    it('should set the screen data', function() {
+      var movieDict = new Dict();
+      movieDict.set('Type', Name.get('Annot'));
+      movieDict.set('Subtype', Name.get('Screen'));
+      movieDict.set('F', '123');
+
+      var lineRef = new Ref(122, 0);
+      var xref = new XRefMock([
+        { ref: lineRef, data: movieDict, }
+      ]);
+
+      var annotation = AnnotationFactory.create(xref, lineRef, pdfManagerMock,
+                                                idFactoryMock);
+      var data = annotation.data;
+      expect(data.annotationType).toEqual(AnnotationType.SCREEN);
+
+      expect(data.src).toEqual('123');
+    });
+  });
 });

@@ -115,6 +115,9 @@ class AnnotationFactory {
       case 'Movie':
         return new MovieAnnotation(parameters);
 
+      case 'Screen':
+        return new ScreenAnnotation(parameters);
+
       default:
         if (!subtype) {
           warn('Annotation is missing the required /Subtype.');
@@ -1047,6 +1050,58 @@ class MovieAnnotation extends Annotation {
     super(parameters);
 
     this.data.annotationType = AnnotationType.MOVIE;
+
+    let mimes = {
+      'avi': 'video/avi',
+      'mov': 'video/quicktime',
+      'mpg': 'video/mpeg'
+    },
+    dict = parameters.dict;
+
+    if (dict.get('Subtype').name === 'Screen') {
+      this.data.contentType = dict.get('A').get('R').get('C').get('CT') || '';
+
+      if ((/^(video|audio)\//).test(this.data.contentType) === false) {
+	    return;
+      }
+
+      let dest = dict.get('A').get('R').get('C').get('D');
+      if (dest.has('EF')) {
+        var fileStream = dest.get('EF').get('F').getBytes();
+        var blob = new Blob([fileStream], {type: data.contentType});
+        this.data.src = PDFJS.createObjectURL(blob);
+      } else {
+        var fileUrl = dest.get('F');
+        this.data.src = fileUrl;
+      }
+    } else {
+      var file = dict.get('Movie').get('F').get('F');
+
+      this.data.contentType = mimes[file.substring(file.lastIndexOf('.') + 1)];
+
+      if (!data.contentType) {
+        return;
+      }
+
+      if (dict.get('Movie').has('Poster')) {
+        var poster = dict.get('Movie').get('Poster').getBytes();
+        var posterBlob = new Blob([poster]);
+        this.data.poster = PDFJS.createObjectURL(posterBlob);
+      }
+
+      this.data.src = file;
+    }
+
+    this._preparePopup(parameters.dict);
+  }
+}
+
+class ScreenAnnotation extends MovieAnnotation {
+  constructor(parameters) {
+    super(parameters);
+
+    this.data.annotationType = AnnotationType.SCREEN;
+
     this._preparePopup(parameters.dict);
   }
 }

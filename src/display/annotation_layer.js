@@ -104,7 +104,8 @@ class AnnotationElementFactory {
       case AnnotationType.FILEATTACHMENT:
         return new FileAttachmentAnnotationElement(parameters);
 
-      case AnnotationType.Movie:
+      case AnnotationType.MOVIE:
+      case AnnotationType.SCREEN:
         return new MovieAnnotationElement(parameters);
 
       default:
@@ -1185,7 +1186,8 @@ class FileAttachmentAnnotationElement extends AnnotationElement {
 
 class MovieAnnotationElement extends AnnotationElement {
   constructor(parameters) {
-    super(parameters, /* isRenderable = */ true);
+    let isRenderable = !!(parameters.data.src);
+    super(parameters, isRenderable);
   }
 
   /**
@@ -1200,9 +1202,25 @@ class MovieAnnotationElement extends AnnotationElement {
     this.container.className = 'movieAnnotation';
 
     let movie = document.createElement('video');
-    movie.setAttribute('src', 'none');
+    moviesrc = this.data.src || '';
+    movie.type = this.data.contentType || '';
+    movie.poster = this.data.poster || '';
+    movie.controls = true;
+
+    movie.style.borderWidth = this.data.borderWidth + 'px';
+    movie.style.borderColor = Util.makeCssRgb(this.data.color[0] | 0,
+                                              this.data.color[1] | 0,
+                                              this.data.color[2] | 0);
+    movie.style.borderStyle = 'solid';
+    movie.style.width = this.data.rect[2] - this.data.rect[0] -
+                        2 * this.data.borderWidth + 'px';
+    movie.style.height = this.data.rect[3] - this.data.rect[1] -
+	                    2 * this.data.borderWidth + 'px';
+    movie.data = this.data.src || '';
+    movie.type = this.data.contentType || '';
+
     this.container.append(movie);
-//console.log(this.data)
+
     return this.container;
   }
 }
